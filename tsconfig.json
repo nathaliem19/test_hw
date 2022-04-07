@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "umd",
+    "target": "es5",
+    "sourceMap": true,
+    "moduleResolution": "Node",
+    "types": ["node", "jest"],
+    "typeRoots": ["./node_modules/@types"],
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
