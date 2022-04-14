@@ -16,7 +16,6 @@ describe('Tests',() => {
     afterEach(async () => {
         await browser.close();
     })
-
     test('Correct page title', async () => {
         const pageTitle = await page.title();
         expect(pageTitle).toBe('Войти');
@@ -28,24 +27,29 @@ describe('Tests',() => {
     })
 
     test("Correct footer title", async () => {
-        const footerTitleText = await page.$eval('div[class="col-xs-12 text-center"]', el => el.textContent);
+        const footer = await page.$('div[class="col-xs-12 text-center"]')
+        const footerTitleText = await footer.evaluate(el => el.textContent);
         expect(footerTitleText).toEqual("МКН СПбГУ, 2019–20 гг.");
     })
 
     test("Hints exist", async () => {
-        const hint = await page.$eval('input[placeholder="Пароль"]', el => (!!el));
-        expect(hint).toBe(true);
+        const hint = await page.$('input[placeholder="Пароль"]');
+        const hintContent = hint.evaluate(el => (!!el));
+        !expect(hintContent);
     })
 
     test("Random incorrect input", async () => {
         let email = "мем приколдес";
         let password = "а где";
 
-        await page.$eval('input[name="username"]', (el, email) => {el.value = email}, email);
+        const username = await page.$('input[name="username"]');
+        await username.evaluate((username, email) => {username.value = email}, email);
 
-        await page.$eval('input[name="password"]', (el, password) => {el.value = password}, password);
+        const passwordCheck = await page.$('input[name="username"]');
+        await passwordCheck.evaluate((passwordCheck, password) => {passwordCheck.value = password}, password);
 
-        await page.$eval('input[type="submit"]', el => el.click())
+        const submitButton = await page.$('input[type="submit"]');
+        await submitButton.click();
 
         await page.waitFor(1000);
         const error = await page.waitForSelector('span.error-message');
@@ -60,16 +64,20 @@ describe('Tests',() => {
         const pageTitle = await page.title();
         expect(pageTitle).toBe('Восстановление пароля');
     });
-
     test("Random incorrect input (email)", async () => {
         let email = "мем приколдес";
         await page.goto("https://emkn.ru/password_reset/")
 
-        await page.$eval('input[name="email"]', (el, email) => {el.value = email}, email);
-        await page.$eval('input[type="submit"]', el => el.click())
+        const mail = await page.$('input[name="email"]');
+        await mail.evaluate((mail, email) => {mail.value = email}, email);
+
+        const submitButton = await page.$('input[type="submit"]');
+        await submitButton.click();
 
         await page.waitFor(2000);
-        const errorMessage = await page.$eval('span.error-message', el => el.textContent);
+
+        const error = await page.$('span.error-message');
+        const errorMessage = await error.evaluate(el => el.textContent)
         expect(errorMessage).toMatch(/Введите корректный адрес электронной почты./);
     })
 
@@ -77,14 +85,18 @@ describe('Tests',() => {
         let email = "example@mail.ru";
         await page.goto("https://emkn.ru/password_reset/")
 
-        await page.$eval('input[name="email"]', (el, email) => {el.value = email}, email);
-        await page.$eval('input[type="submit"]', el => el.click())
+        const mail = await page.$('input[name="email"]');
+        await mail.evaluate((mail, email) => {mail.value = email}, email);
+
+        const submitButton = await page.$('input[type="submit"]');
+        await submitButton.click();
 
         await page.waitFor(1000);
 
         expect(page.url()).toEqual('https://emkn.ru/password_reset/done/');
 
-        const res = await page.$eval('div.container-box', el => el.textContent);
-        expect(res).toMatch(/Инструкции по смене пароля были высланы на указанный почтовый адрес./);
+        const res = await page.$('div.container-box');
+        const resText =  await res.evaluate(el => el.textContent);
+        expect(resText).toMatch(/Инструкции по смене пароля были высланы на указанный почтовый адрес./);
     })
 })
