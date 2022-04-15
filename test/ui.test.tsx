@@ -45,7 +45,7 @@ describe('Tests',() => {
         const username = await page.$('input[name="username"]');
         await username.evaluate((username, email) => {username.value = email}, email);
 
-        const passwordCheck = await page.$('input[name="username"]');
+        const passwordCheck = await page.$('input[name="password"]');
         await passwordCheck.evaluate((passwordCheck, password) => {passwordCheck.value = password}, password);
 
         const submitButton = await page.$('input[type="submit"]');
